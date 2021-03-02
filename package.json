@@ -1,0 +1,28 @@
+{
+  "name": "quinpel-dsk",
+  "version": "0.1.0",
+  "description": "Qinpel Desk - Quick Interface for Pointel on Desktop.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-packager . --all --prune=true --overwrite --icon=favicon.ico --out=build Qinpel"
+  },
+  "repository": "https://github.com/emuvi/qinpel-dsk",
+  "keywords": [
+    "Qinpel",
+    "Quick",
+    "Interface",
+    "Pointel",
+    "Desktop"
+  ],
+  "author": "Everton Murilo Vieira",
+  "devDependencies": {
+    "electron": "^11.2.3",
+    "electron-packager": "^15.2.0"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "electron-store": "^6.0.0",
+    "express": "^4.17.1"
+  }
+}
