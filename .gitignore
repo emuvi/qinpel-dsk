@@ -1,3 +1,4 @@
-node_modules/
-programs/
+/build
+/node_modules
+/programs
 *.log
