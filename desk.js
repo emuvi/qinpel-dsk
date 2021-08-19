@@ -17,9 +17,9 @@ function showInfo() {
   imgFoot.src = "./desk-info.png";
 }
 
-function showErro() {
+function showError() {
   divFoot.style.display = "";
-  imgFoot.src = "./desk-erro.png";
+  imgFoot.src = "./desk-Error.png";
 }
 
 const divText = document.getElementById("QinpelDeskText");
@@ -71,7 +71,7 @@ function putInfoMsg(message) {
   showInfo();
 }
 
-function putErroMsg(message) {
+function putErrorMsg(message) {
   addMsg(message);
-  showErro();
+  showError();
 }

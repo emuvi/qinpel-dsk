@@ -1,21 +1,39 @@
 const http = require("http");
 const fs = require("fs");
+const { exception } = require("console");
 
 function init(refMainDsk) {
   initSetup();
-  initServer();
+  initQinpelStp();
+  initQinpelSrv();
 
   function initSetup() {
-    refMainDsk.putLoadMsg("Starting setup...");
+    refMainDsk.putInfoMsg("Starting setup...");
     const setup = require("./setup.json");
     refMainDsk.setup = setup;
   }
 
-  function initServer() {
-    refMainDsk.putLoadMsg("Starting server...");
-    refMainDsk.putLoadMsg("Checking server address...");
+  function initQinpelStp() {
+    refMainDsk.putInfoMsg("Starting QinpelStp...");
+    refMainDsk.putInfoMsg("Checking if installer exists...");
+    executable = "qinpel-stp" + getExecutableExtension();
+    if (fs.existsSync("./" + executable)) {
+      refMainDsk.putInfoMsg("QinpelStp exists, you're good to go!");
+    } else {
+      refMainDsk.putInfoMsg("QinpelStp doesn't exists, must be downloaded.");
+      downloadQinpelStp();
+    }
+  }
+
+  function downloadQinpelStp() {
+
+  }
+
+  function initQinpelSrv() {
+    refMainDsk.putInfoMsg("Starting QinpelSrv...");
+    refMainDsk.putInfoMsg("Checking server address...");
     if (!refMainDsk.setup.host) {
-      refMainDsk.putErroMsg("Error: The server host must be in the setup file.");
+      refMainDsk.putErrorMsg("Error: The server host must be in the setup file.");
       return;
     }
     refMainDsk.address =
@@ -32,11 +50,11 @@ function init(refMainDsk) {
           refMainDsk.putInfoMsg("The server is running alright!");
           refMainDsk.subLoad("/run");
         } else {
-          refMainDsk.putErroMsg("Error: Another server is running on this address.");  
+          refMainDsk.putErrorMsg("Error: Another server is running on this address.");
         }
       })
       .catch((err) => {
-        refMainDsk.putErroMsg(err.toString());
+        refMainDsk.putErrorMsg(err.toString());
       });
   }
 }
@@ -50,7 +68,7 @@ function httpGet(url) {
         response.on("data", (chunk) => (body += chunk));
         response.on("end", () => resolve(body));
       })
-      .on("error", reject);
+      .on("Error", reject);
   });
 }
 
@@ -63,14 +81,44 @@ function download(origin, destiny, callBack) {
     response.pipe(file);
   });
   file.on("finish", () => file.close(callBack));
-  request.on("error", (err) => {
+  request.on("Error", (err) => {
     fs.unlink(destiny);
     return callBack(err.message);
   });
-  file.on("error", (err) => {
+  file.on("Error", (err) => {
     fs.unlink(destiny);
     return callBack(err.message);
   });
+}
+
+function getOs() {
+  if (process.platform.startsWith("win")) {
+    return "win";
+  } else if (process.platform.startsWith("lin")) {
+    return "lin";
+  } else if (process.platform.startsWith("dar")) {
+    return "mac";
+  } else {
+    throw "Operation system not supported.";
+  }
+}
+
+function getArch() {
+  if (process.arch.contains("64")) {
+    return "64";
+  } else if (process.arch.contains("32")) {
+    return "32";
+  } else {
+    throw "System architecture not supported.";
+  }
+}
+
+function getExecutableExtension() {
+  if (process.platform.startsWith("win")) {
+    return ".exe";
+  } else {
+    return "";
+  }
 }
 
 module.exports = { init };

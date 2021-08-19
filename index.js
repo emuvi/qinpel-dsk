@@ -5,7 +5,8 @@ const starter = require("./starter");
 
 const refMainDsk = {
   setup: null,
-  address: "file://" + __dirname + "/desk.html",
+  rootAddress: "file://" + __dirname,
+  fullAddress: "file://" + __dirname + "/desk.html",
   subLoad: null,
   window: null,
   load: windowLoad,
@@ -13,7 +14,7 @@ const refMainDsk = {
   call: windowCall,
   putLoadMsg: putLoadMsg,
   putInfoMsg: putInfoMsg,
-  putErroMsg: putErroMsg,
+  putErrorMsg: putErrorMsg,
 };
 
 function windowCreate() {
@@ -26,7 +27,7 @@ function windowCreate() {
   refMainDsk.window = window;
   window.removeMenu();
   window.setMaximizable(false);
-  window.loadURL(refMainDsk.address);
+  window.loadURL(refMainDsk.fullAddress);
   window.once("ready-to-show", window.show);
   window.on("close", () => {
     storage.set("QinpelDskMainWindowBounds", window.getBounds());
@@ -39,16 +40,24 @@ function windowCreate() {
       starter.init(refMainDsk);
     }
   });
-  
 }
 
 function windowLoad(address) {
-  refMainDsk.address = address;
-  refMainDsk.window.loadURL(address);
+  url = new URL(address);
+  refMainDsk.rootAddress = url.host;
+  refMainDsk.fullAddress = url.href;
+  console.log(
+    "[DEBUG] Check if this is the proper root address: '" +
+      refMainDsk.rootAddress +
+      "' of: '" +
+      address +
+      "'"
+  );
+  refMainDsk.window.loadURL(refMainDsk.fullAddress);
 }
 
 function windowSubLoad(subAddress) {
-  refMainDsk.subLoad = new URL(subAddress, refMainDsk.address).href;
+  refMainDsk.subLoad = new URL(subAddress, refMainDsk.rootAddress).href;
   refMainDsk.window.loadURL(refMainDsk.subLoad);
 }
 
@@ -65,7 +74,7 @@ function putLoadMsg(message) {
   if (isDeskLoaded()) {
     refMainDsk.call("putLoadMsg(`" + message + "`)");
   } else {
-    console.log("LOAD: " + message);
+    console.log("[LOAD] : " + message);
   }
 }
 
@@ -73,15 +82,15 @@ function putInfoMsg(message) {
   if (isDeskLoaded()) {
     refMainDsk.call("putInfoMsg(`" + message + "`)");
   } else {
-    console.log("INFO: " + message);
+    console.log("[INFO] : " + message);
   }
 }
 
-function putErroMsg(message) {
+function putErrorMsg(message) {
   if (isDeskLoaded()) {
-    refMainDsk.call("putErroMsg(`" + message + "`)");
+    refMainDsk.call("putErrorMsg(`" + message + "`)");
   } else {
-    console.log("ERRO: " + message);
+    console.log("[Error] : " + message);
   }
 }
 
