@@ -1,9 +1,14 @@
 const { app, BrowserWindow } = require("electron");
 const ElectronStore = require("electron-store");
 const storage = new ElectronStore();
-const starter = require("./starter");
+const starter = require("./handler");
+
+const qinpelStpRoot = "http://www.pointel.com.br/qinpel"
+
+const constants = [qinpelStpRoot]
 
 const refMainDsk = {
+  constants,
   setup: null,
   rootAddress: "file://" + __dirname,
   fullAddress: "file://" + __dirname + "/desk.html",
@@ -41,6 +46,15 @@ function windowCreate() {
     }
   });
 }
+
+app.whenReady().then(() => {
+  windowCreate();
+});
+
+app.on("window-all-closed", function () {
+  if (process.platform !== "darwin") app.quit();
+});
+
 
 function windowLoad(address) {
   url = new URL(address);
@@ -94,10 +108,32 @@ function putErrorMsg(message) {
   }
 }
 
-app.whenReady().then(() => {
-  windowCreate();
-});
+function getOs() {
+  if (process.platform.startsWith("win")) {
+    return "win";
+  } else if (process.platform.startsWith("lin")) {
+    return "lin";
+  } else if (process.platform.startsWith("dar")) {
+    return "mac";
+  } else {
+    throw "Operation system not supported.";
+  }
+}
 
-app.on("window-all-closed", function () {
-  if (process.platform !== "darwin") app.quit();
-});
+function getArch() {
+  if (process.arch.contains("64")) {
+    return "64";
+  } else if (process.arch.contains("32")) {
+    return "32";
+  } else {
+    throw "System architecture not supported.";
+  }
+}
+
+function getExecExtension() {
+  if (process.platform.startsWith("win")) {
+    return ".exe";
+  } else {
+    return "";
+  }
+}
