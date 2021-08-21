@@ -14,33 +14,31 @@ function init(refMainDsk) {
 	}
 
 	function initQinpelStp() {
-		var isReady = false;
-		var neverReady = false;
-		var errorReady = null;
-		const execName = "qinpel-stp" + refMainDsk.constants.execExtension;
-
-		const qinpelStp = {
-			install
-		}
-
-		refMainDsk.mods.qinpelStp = qinpelStp;
+		const mod = {
+			isReady: false,
+			neverReady: false,
+			errorReady: null,
+			executable: "qinpel-stp" + refMainDsk.constants.execExtension,
+			rootURL: "http://www.pointel.com.br/qinpel",
+			install: install,
+		};
+		refMainDsk.mods.qinpelStp = mod;
 		refMainDsk.putInfoMsg("QinpelStp starting...");
 		refMainDsk.putInfoMsg("Checking if installer exists...");
-		executable = "qinpel-stp" + refMainDsk.constants.execExtension;
-		if (fs.existsSync("./" + executable)) {
+		if (fs.existsSync("./" + mod.executable)) {
 			refMainDsk.putInfoMsg("QinpelStp exists, you're good to go!");
-			isReady = true;
+			mod.isReady = true;
 		} else {
 			refMainDsk.putInfoMsg("QinpelStp doesn't exists, must be downloaded.");
 			download();
 		}
 
 		function download() {
-			let origin = refMainDsk.constants.qinpelStpURL;
+			let origin = mod.rootURL;
 			origin += "/cmds/" + refMainDsk.constants.os;
 			origin += "/" + refMainDsk.constants.arch;
-			origin += "/qinpel-stp/" + execName;
-			let destiny = execName;
+			origin += "/qinpel-stp/" + mod.executable;
+			let destiny = mod.executable;
 			refMainDsk.putInfoMsg("QinpelStp downloading from: " + origin);
 			refMainDsk.utils.downloadFile(origin, destiny)
 				.then(_ => {
@@ -96,6 +94,12 @@ function init(refMainDsk) {
 	}
 
 	function initQinpelSrv() {
+		const mod = {
+			isReady: false,
+			neverReady: false,
+			errorReady: null,
+		};
+		refMainDsk.mods.qinpelSrv = mod;
 		refMainDsk.putInfoMsg("Starting QinpelSrv...");
 		refMainDsk.putInfoMsg("Checking server address...");
 		if (!refMainDsk.setup.host) {

@@ -1,10 +1,9 @@
 const os = getOs();
 const arch = getArch();
 const execExtension = getExecExtension();
-const qinpelStpURL = "http://www.pointel.com.br/qinpel";
 
 module.exports = {
-  os, arch, execExtension, qinpelStpURL
+  os, arch, execExtension
 }
 
 function getOs() {
