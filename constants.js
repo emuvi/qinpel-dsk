@@ -1,4 +1,11 @@
+const os = getOs();
+const arch = getArch();
+const execExtension = getExecExtension();
+const qinpelStpURL = "http://www.pointel.com.br/qinpel";
 
+module.exports = {
+  os, arch, execExtension, qinpelStpURL
+}
 
 function getOs() {
   if (process.platform.startsWith("win")) {
@@ -28,14 +35,5 @@ function getExecExtension() {
   } else {
     return "";
   }
-}
-
-const os = getOs();
-const arch = getArch();
-const execExtension = getExecExtension();
-const qinpelStpURL = "http://www.pointel.com.br/qinpel";
-
-module.exports = {
-  os, arch, execExtension, qinpelStpURL
 }
 

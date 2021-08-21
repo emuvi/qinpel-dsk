@@ -19,7 +19,7 @@ const refMainDsk = {
 	putLoadMsg: putLoadMsg,
 	putInfoMsg: putInfoMsg,
 	putErrorMsg: putErrorMsg,
-	utils: { getFile },
+	utils: { downloadFile },
 	mods: {},
 };
 
@@ -95,7 +95,7 @@ function putInfoMsg(message) {
 }
 
 function putErrorMsg(message) {
-	console.log("[Error] : " + message);
+	console.log("[ERROR] : " + message);
 	if (isDeskLoaded()) {
 		refMainDsk.call("putErrorMsg(`" + message + "`)");
 	}
@@ -107,8 +107,18 @@ function isDeskLoaded() {
 }
 
 
-function getFile(origin, destiny) {
+function downloadFile(origin, destiny) {
 	const writer = fs.createWriteStream(destiny);
+
+	function remove() {
+		try {
+			writer.close();
+		} catch {}
+		setTimeout(() => fs.unlink(destiny, (err) => {
+			if (err) { putErrorMsg("Download file remove problem. " + err); }
+		}), 1000);
+	}
+
 	return axios({
 		method: 'get',
 		url: origin,
@@ -120,14 +130,20 @@ function getFile(origin, destiny) {
 			writer.on('error', err => {
 				error = err;
 				writer.close();
+				remove();
 				reject(err);
 			});
 			writer.on('close', () => {
 				if (!error) {
 					resolve(true);
+				} else {
+					remove();
 				}
 			});
 		});
+	}).catch(err => {
+		remove();
+		throw err;
 	});
 }
 

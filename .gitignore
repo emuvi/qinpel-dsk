@@ -1,4 +1,6 @@
 /build
 /node_modules
 /programs
+/run
+qinpel-stp*
 *.log
