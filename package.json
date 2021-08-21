@@ -1,20 +1,22 @@
 {
-  "name": "qinpel-dsk",
-  "version": "0.1.0",
-  "description": "QinpelDsk - Desktop Manager for Qinpel",
-  "main": "index.js",
-  "scripts": {
-    "start": "electron .",
-    "build": "electron-packager . --all --overwrite --icon=favicon.ico --out=build Qinpel"
-  },
-  "keywords": [],
-  "author": "Éverton M. Vieira",
-  "license": "LGPL-3.0-only",
-  "dependencies": {
-    "electron-store": "^8.0.0"
-  },
-  "devDependencies": {
-    "electron": "^13.1.7",
-    "electron-packager": "^15.3.0"
-  }
+	"name": "qinpel-dsk",
+	"version": "0.1.0",
+	"description": "QinpelDsk - Desktop Manager for Qinpel",
+	"repository": "https://github.com/emuvi/qinpel-dsk",
+	"main": "index.js",
+	"scripts": {
+		"start": "electron .",
+		"build": "electron-packager . --all --overwrite --icon=favicon.ico --out=build Qinpel"
+	},
+	"keywords": [],
+	"author": "Éverton M. Vieira",
+	"license": "LGPL-3.0-only",
+	"dependencies": {
+		"axios": "^0.21.1",
+		"electron-store": "^8.0.0"
+	},
+	"devDependencies": {
+		"electron": "^13.1.7",
+		"electron-packager": "^15.3.0"
+	}
 }

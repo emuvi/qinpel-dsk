@@ -1,6 +1,5 @@
-const http = require("http");
 const fs = require("fs");
-const { exception } = require("console");
+const axios = require('axios');
 
 function init(refMainDsk) {
   initSetup();
@@ -14,11 +13,16 @@ function init(refMainDsk) {
   }
 
   function initQinpelStp() {
+	const qinpelStp = {
+	  ready: false,
+	}
+	refMainDsk.mods.qinpelStp = qinpelStp;
     refMainDsk.putInfoMsg("Starting QinpelStp...");
     refMainDsk.putInfoMsg("Checking if installer exists...");
-    executable = "qinpel-stp" + getExecutableExtension();
+    executable = "qinpel-stp" + refMainDsk.constants.execExtension;
     if (fs.existsSync("./" + executable)) {
       refMainDsk.putInfoMsg("QinpelStp exists, you're good to go!");
+	  qinpelStp.ready = true;
     } else {
       refMainDsk.putInfoMsg("QinpelStp doesn't exists, must be downloaded.");
       downloadQinpelStp();
@@ -43,7 +47,7 @@ function init(refMainDsk) {
       (refMainDsk.setup.path ? refMainDsk.setup.path : "/");
     refMainDsk.putInfoMsg("The server address is: " + refMainDsk.address);
     refMainDsk.putLoadMsg("Checking if the server is online...");
-    httpGet(refMainDsk.address)
+	axios.get(refMainDsk.address)
       .then((res) => {
         refMainDsk.putInfoMsg("Response: " + res.toString());
         if (res.startsWith("QinpelSrv")) {
@@ -59,66 +63,5 @@ function init(refMainDsk) {
   }
 }
 
-function httpGet(url) {
-  return new Promise((resolve, reject) => {
-    http
-      .get(url, (response) => {
-        response.setEncoding("utf8");
-        let body = "";
-        response.on("data", (chunk) => (body += chunk));
-        response.on("end", () => resolve(body));
-      })
-      .on("Error", reject);
-  });
-}
-
-function download(origin, destiny, callBack) {
-  const file = fs.createWriteStream(destiny);
-  const request = http.get(origin, (response) => {
-    if (response.statusCode !== 200) {
-      return callBack("Response status was " + response.statusCode);
-    }
-    response.pipe(file);
-  });
-  file.on("finish", () => file.close(callBack));
-  request.on("Error", (err) => {
-    fs.unlink(destiny);
-    return callBack(err.message);
-  });
-  file.on("Error", (err) => {
-    fs.unlink(destiny);
-    return callBack(err.message);
-  });
-}
-
-function getOs() {
-  if (process.platform.startsWith("win")) {
-    return "win";
-  } else if (process.platform.startsWith("lin")) {
-    return "lin";
-  } else if (process.platform.startsWith("dar")) {
-    return "mac";
-  } else {
-    throw "Operation system not supported.";
-  }
-}
-
-function getArch() {
-  if (process.arch.contains("64")) {
-    return "64";
-  } else if (process.arch.contains("32")) {
-    return "32";
-  } else {
-    throw "System architecture not supported.";
-  }
-}
-
-function getExecutableExtension() {
-  if (process.platform.startsWith("win")) {
-    return ".exe";
-  } else {
-    return "";
-  }
-}
 
 module.exports = { init };
