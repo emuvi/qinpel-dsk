@@ -5,20 +5,20 @@ const constants = require("./constants");
 const handler = require("./handler");
 const axios = require("axios");
 const fs = require("fs");
+const { exec } = require("child_process");
+const path = require("path");
 
 const refMainDsk = {
 	constants,
 	setup: null,
-	rootAddress: "file://" + __dirname,
-	fullAddress: "file://" + __dirname + "/desk.html",
-	subLoad: null,
 	window: null,
-	load: windowLoad,
-	subLoad: windowSubLoad,
-	call: windowCall,
-	putLoadMsg: putLoadMsg,
-	putInfoMsg: putInfoMsg,
-	putErrorMsg: putErrorMsg,
+	load: mainLoad,
+	call: mainCall,
+	loadApp: mainLoadApp,
+	callCmd: mainCallCmd,
+	putLoadMsg: mainPutLoadMsg,
+	putInfoMsg: mainPutInfoMsg,
+	putErrorMsg: mainPutErrorMsg,
 	utils: { downloadFile },
 	mods: {},
 };
@@ -33,7 +33,7 @@ function windowCreate() {
 	refMainDsk.window = window;
 	window.removeMenu();
 	window.setMaximizable(false);
-	window.loadURL(refMainDsk.fullAddress);
+	window.loadURL(refMainDsk.constants.rootAddress + "/desk.html");
 	window.once("ready-to-show", window.show);
 	window.on("close", () => {
 		storage.set("QinpelDskMainWindowBounds", window.getBounds());
@@ -57,44 +57,59 @@ app.on("window-all-closed", function() {
 });
 
 
-function windowLoad(address) {
-	url = new URL(address);
-	refMainDsk.rootAddress = url.host;
-	refMainDsk.fullAddress = url.href;
-	console.log(
-		"[DEBUG] Check if this is the proper root address: '" +
-		refMainDsk.rootAddress +
-		"' of: '" +
-		address +
-		"'"
-	);
-	refMainDsk.window.loadURL(refMainDsk.fullAddress);
+function mainLoad(address) {
+	refMainDsk.window.loadURL(address);
 }
 
-function windowSubLoad(subAddress) {
-	refMainDsk.subLoad = new URL(subAddress, refMainDsk.rootAddress).href;
-	refMainDsk.window.loadURL(refMainDsk.subLoad);
-}
-
-function windowCall(script) {
+function mainCall(script) {
 	refMainDsk.window.webContents.executeJavaScript(script);
 }
 
-function putLoadMsg(message) {
+function mainLoadApp(name) {
+	refMainDsk.window.loadURL(refMainDsk.constants.rootAddress
+		+ "/run/apps/" + name + "/index.html");
+}
+
+function mainCallCmd(name, arguments) {
+	return new Promise((resolve, reject) => {
+		let workDir = path.join(__dirname, "run", "cmds", name);
+		let calling = path.join(workDir, name + refMainDsk.constants.execExtension)
+			+ " " + arguments;
+		console.log(`CallCmd ${name} calling: ${calling}`);
+		console.log(`CallCmd ${name} directory: ${workDir}`);
+		exec(calling, {
+			cwd: workDir
+		}, (error, stdout, stderr) => {
+			if (stdout) {
+				console.log(`CallCmd ${name} stdout: ${stdout}`);
+			}
+			if (stderr) {
+				console.log(`CallCmd ${name} stderr: ${stderr}`);
+			}
+			if (error) {
+				reject(error);
+			} else {
+				resolve(true);
+			}
+		});
+	});
+}
+
+function mainPutLoadMsg(message) {
 	console.log("[LOAD] : " + message);
 	if (isDeskLoaded()) {
 		refMainDsk.call("putLoadMsg(`" + message + "`)");
 	}
 }
 
-function putInfoMsg(message) {
+function mainPutInfoMsg(message) {
 	console.log("[INFO] : " + message);
 	if (isDeskLoaded()) {
 		refMainDsk.call("putInfoMsg(`" + message + "`)");
 	}
 }
 
-function putErrorMsg(message) {
+function mainPutErrorMsg(message) {
 	console.log("[ERROR] : " + message);
 	if (isDeskLoaded()) {
 		refMainDsk.call("putErrorMsg(`" + message + "`)");
@@ -113,9 +128,9 @@ function downloadFile(origin, destiny) {
 	function remove() {
 		try {
 			writer.close();
-		} catch {}
+		} catch { }
 		setTimeout(() => fs.unlink(destiny, (err) => {
-			if (err) { putErrorMsg("Download file remove problem. " + err); }
+			if (err) { mainPutErrorMsg("Download file remove problem. " + err); }
 		}), 1000);
 	}
 

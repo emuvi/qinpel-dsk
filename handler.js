@@ -43,12 +43,12 @@ function init(refMainDsk) {
 			refMainDsk.utils.downloadFile(origin, destiny)
 				.then(_ => {
 					refMainDsk.putInfoMsg("QinpelStp downloaded with success.");
-					isReady = true;
+					mod.isReady = true;
 				})
 				.catch(err => {
 					refMainDsk.putErrorMsg("QinpelStp download problem. " + err);
-					neverReady = true;
-					errorReady = err;
+					mod.neverReady = true;
+					mod.errorReady = err;
 				});
 		}
 
@@ -57,9 +57,9 @@ function init(refMainDsk) {
 				tryExecute();
 
 				function tryExecute() {
-					if (neverReady) {
-						reject(errorReady);
-					} else if (isReady) {
+					if (mod.neverReady) {
+						reject(mod.errorReady);
+					} else if (mod.isReady) {
 						execute();
 					} else {
 						waitAndTry();
@@ -77,15 +77,17 @@ function init(refMainDsk) {
 
 				function execute() {
 					exec(execName + " " + arguments, (error, stdout, stderr) => {
-						if (error) {
-							console.log(`error: ${error.toString()}`);
-							return;
+						if (stdout) {
+							console.log(`QinpelStp stdout: ${stdout}`);
 						}
 						if (stderr) {
-							console.log(`stderr: ${stderr}`);
-							return;
+							console.log(`QinpelStp stderr: ${stderr}`);
 						}
-						console.log(`stdout: ${stdout}`);
+						if (error) {
+							reject(error);
+						} else {
+							resolve(true);
+						}
 					});
 				}
 			});
@@ -102,15 +104,15 @@ function init(refMainDsk) {
 		refMainDsk.mods.qinpelSrv = mod;
 		refMainDsk.putInfoMsg("Starting QinpelSrv...");
 		refMainDsk.putInfoMsg("Checking server address...");
-		if (!refMainDsk.setup.host) {
+		if (!refMainDsk.setup.clientHost) {
 			refMainDsk.putErrorMsg("Error: The server host must be in the setup file.");
 			return;
 		}
 		refMainDsk.address =
 			"http://" +
-			refMainDsk.setup.host +
-			(refMainDsk.setup.port ? ":" + refMainDsk.setup.port : "") +
-			(refMainDsk.setup.path ? refMainDsk.setup.path : "/");
+			refMainDsk.setup.clientHost +
+			(refMainDsk.setup.clientPort ? ":" + refMainDsk.setup.clientPort : "") +
+			(refMainDsk.setup.clientPath ? refMainDsk.setup.clientPath : "/");
 		refMainDsk.putInfoMsg("The server address is: " + refMainDsk.address);
 		refMainDsk.putLoadMsg("Checking if the server is online...");
 		axios.get(refMainDsk.address)
@@ -118,9 +120,12 @@ function init(refMainDsk) {
 				refMainDsk.putInfoMsg("Response: " + res.toString());
 				if (res.startsWith("QinpelSrv")) {
 					refMainDsk.putInfoMsg("The server is running alright!");
-					refMainDsk.subLoad("/run");
+					mod.isReady = true;
 				} else {
-					refMainDsk.putErrorMsg("Error: Another server is running on this address.");
+					let error = "Error: Another server is running on this address.";
+					refMainDsk.putErrorMsg(error);
+					mod.neverReady = true;
+					mod.errorReady = error;
 				}
 			})
 			.catch((err) => {
