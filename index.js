@@ -16,7 +16,11 @@ const refMainDsk = {
 	call: mainCall,
 	loadApp: mainLoadApp,
 	callCmd: mainCallCmd,
+	putDebugMsg: mainPutDebugMsg,
 	putLoadMsg: mainPutLoadMsg,
+	putLoadEnd: mainPutLoadEnd,
+	putLoadEndInfoMsg: mainPutLoadEndInfoMsg,
+	putLoadEndErrorMsg: mainPutLoadEndErrorMsg,
 	putInfoMsg: mainPutInfoMsg,
 	putErrorMsg: mainPutErrorMsg,
 	utils: { downloadFile },
@@ -42,7 +46,7 @@ function windowCreate() {
 	window.webContents.on("did-finish-load", () => {
 		if (firstLoad) {
 			firstLoad = false;
-			refMainDsk.call("putLoadMsg('Starting...')");
+			refMainDsk.call("putInfoMsg('Starting...')");
 			handler.init(refMainDsk);
 		}
 	});
@@ -95,11 +99,31 @@ function mainCallCmd(name, arguments) {
 	});
 }
 
+function mainPutDebugMsg(message) {
+	console.log("[DEBUG] : " + message);
+}
+
 function mainPutLoadMsg(message) {
 	console.log("[LOAD] : " + message);
 	if (isDeskLoaded()) {
 		refMainDsk.call("putLoadMsg(`" + message + "`)");
 	}
+}
+
+function mainPutLoadEnd() {
+	if (isDeskLoaded()) {
+		refMainDsk.call("putLoadEnd()");
+	}
+}
+
+function mainPutLoadEndInfoMsg(message) {
+	mainPutLoadEnd();
+	mainPutInfoMsg(message);
+}
+
+function mainPutLoadEndErrorMsg(message) {
+	mainPutLoadEnd();
+	mainPutErrorMsg(message);
 }
 
 function mainPutInfoMsg(message) {

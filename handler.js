@@ -10,7 +10,12 @@ function init(refMainDsk) {
 	function initSetup() {
 		refMainDsk.putInfoMsg("Starting setup...");
 		const setup = require("./setup.json");
+		setup.isLocalHost = isLocalHost;
 		refMainDsk.setup = setup;
+
+		function isLocalHost() {
+			return setup.clientHost == "localhost" || setup.clientHost == "127.0.0.1";
+		}
 	}
 
 	function initQinpelStp() {
@@ -20,7 +25,7 @@ function init(refMainDsk) {
 			errorReady: null,
 			executable: "qinpel-stp" + refMainDsk.constants.execExtension,
 			rootURL: "http://www.pointel.com.br/qinpel",
-			install: install,
+			call: call,
 		};
 		refMainDsk.mods.qinpelStp = mod;
 		refMainDsk.putInfoMsg("QinpelStp starting...");
@@ -39,20 +44,20 @@ function init(refMainDsk) {
 			origin += "/" + refMainDsk.constants.arch;
 			origin += "/qinpel-stp/" + mod.executable;
 			let destiny = mod.executable;
-			refMainDsk.putInfoMsg("QinpelStp downloading from: " + origin);
+			refMainDsk.putLoadMsg("QinpelStp downloading from: " + origin);
 			refMainDsk.utils.downloadFile(origin, destiny)
 				.then(_ => {
-					refMainDsk.putInfoMsg("QinpelStp downloaded with success.");
+					refMainDsk.putLoadEndInfoMsg("QinpelStp downloaded with success.");
 					mod.isReady = true;
 				})
 				.catch(err => {
-					refMainDsk.putErrorMsg("QinpelStp download problem. " + err);
+					refMainDsk.putLoadEndErrorMsg("QinpelStp download problem. " + err);
 					mod.neverReady = true;
 					mod.errorReady = err;
 				});
 		}
 
-		function install(arguments) {
+		function call(arguments) {
 			return new Promise((resolve, reject) => {
 				tryExecute();
 
@@ -70,13 +75,13 @@ function init(refMainDsk) {
 				function waitAndTry() {
 					tryTimes++;
 					if (tryTimes > 3) {
-						throw "It's not ready to install yet!";
+						reject("It's not ready to install anything yet!");
 					}
-					setTimeout(tryExecute, 3000);
+					setTimeout(tryExecute, tryTimes * 3000);
 				}
 
 				function execute() {
-					exec(execName + " " + arguments, (error, stdout, stderr) => {
+					exec(mod.executable + " " + arguments, (error, stdout, stderr) => {
 						if (stdout) {
 							console.log(`QinpelStp stdout: ${stdout}`);
 						}
@@ -117,7 +122,7 @@ function init(refMainDsk) {
 		refMainDsk.putLoadMsg("Checking if the server is online...");
 		axios.get(refMainDsk.address)
 			.then((res) => {
-				refMainDsk.putInfoMsg("Response: " + res.toString());
+				refMainDsk.putLoadEndInfoMsg("Response: " + res.toString());
 				if (res.startsWith("QinpelSrv")) {
 					refMainDsk.putInfoMsg("The server is running alright!");
 					mod.isReady = true;
@@ -129,7 +134,11 @@ function init(refMainDsk) {
 				}
 			})
 			.catch((err) => {
-				refMainDsk.putErrorMsg(err.toString());
+				if (!refMainDsk.setup.isLocalHost()) {
+					refMainDsk.putLoadEndErrorMsg("QinpelSrv connect problem. " + err);
+				} else {
+					refMainDsk.putLoadEndInfoMsg("QinpelSrv is not started yet.");
+				}
 			});
 	}
 }
