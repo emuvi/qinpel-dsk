@@ -1,12 +1,14 @@
 const { app, BrowserWindow } = require("electron");
 const ElectronStore = require("electron-store");
 const storage = new ElectronStore();
-const constants = require("./constants");
-const handler = require("./handler");
-const axios = require("axios");
+
 const fs = require("fs");
-const { exec } = require("child_process");
 const path = require("path");
+const { exec } = require("child_process");
+const axios = require("axios");
+
+const constants = require("./constants");
+const initializer = require("./initializer");
 
 const refMainDsk = {
 	constants,
@@ -15,7 +17,7 @@ const refMainDsk = {
 	load: mainLoad,
 	call: mainCall,
 	loadApp: mainLoadApp,
-	callCmd: mainCallCmd,
+	callCmd: mainCallCmd,	
 	putDebugMsg: mainPutDebugMsg,
 	putLoadMsg: mainPutLoadMsg,
 	putLoadEnd: mainPutLoadEnd,
@@ -24,7 +26,7 @@ const refMainDsk = {
 	putInfoMsg: mainPutInfoMsg,
 	putErrorMsg: mainPutErrorMsg,
 	utils: { downloadFile },
-	mods: {},
+	mods: [],
 };
 
 function windowCreate() {
@@ -36,8 +38,7 @@ function windowCreate() {
 	const window = new BrowserWindow(options);
 	refMainDsk.window = window;
 	window.removeMenu();
-	window.setMaximizable(false);
-	window.loadURL(refMainDsk.constants.rootAddress + "/desk.html");
+	window.loadURL(refMainDsk.constants.deskAddress);
 	window.once("ready-to-show", window.show);
 	window.on("close", () => {
 		storage.set("QinpelDskMainWindowBounds", window.getBounds());
@@ -46,8 +47,9 @@ function windowCreate() {
 	window.webContents.on("did-finish-load", () => {
 		if (firstLoad) {
 			firstLoad = false;
-			refMainDsk.call("putInfoMsg('Starting...')");
-			handler.init(refMainDsk);
+			refMainDsk.call("putInfoMsg('QinpelDsk starting...')");
+			initializer.init(refMainDsk);
+			mainStart();
 		}
 	});
 }
@@ -60,6 +62,49 @@ app.on("window-all-closed", function() {
 	if (process.platform !== "darwin") app.quit();
 });
 
+function mainStart() {
+	tryStart();
+
+	function tryStart() {
+		mainPutInfoMsg("QinpelDsk trying to start.");
+		if (allReady()) {
+			start();
+		} else {
+			let error = getErrorNever();
+			if (error) {
+				abort(error);
+			} else {
+				setTimeout(tryStart, 1000);
+			}
+		}
+	}
+
+	function allReady() {
+		for (let mod of refMainDsk.mods) {
+			if (!mod.isReady) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	function getErrorNever() {
+		for (let mod of refMainDsk.mods) {
+			if (mod.neverReady) {
+				return mod.errorReady;
+			}
+		}
+		return false;
+	}
+
+	function start() {
+		mainLoadApp("qinpel");
+	}
+
+	function abort(error) {
+		mainPutErrorMsg("QinpelDsk had problems to be started. - " + error);
+	}
+}
 
 function mainLoad(address) {
 	refMainDsk.window.loadURL(address);
@@ -70,7 +115,7 @@ function mainCall(script) {
 }
 
 function mainLoadApp(name) {
-	refMainDsk.window.loadURL(refMainDsk.constants.rootAddress
+	refMainDsk.window.loadURL(refMainDsk.constants.fileAddress
 		+ "/run/apps/" + name + "/index.html");
 }
 
@@ -142,11 +187,12 @@ function mainPutErrorMsg(message) {
 
 function isDeskLoaded() {
 	const loaded = refMainDsk.window.webContents.getURL().toString().toLowerCase();
-	return loaded.startsWith("file://") && loaded.endsWith("/desk.html");
+	return loaded == refMainDsk.constants.deskAddress;
 }
 
 
 function downloadFile(origin, destiny) {
+	refMainDsk.putInfoMsg("QinpelDsk downloading file from: '" + origin + "' to: '" + destiny + "'")
 	const writer = fs.createWriteStream(destiny);
 
 	function remove() {
@@ -154,7 +200,7 @@ function downloadFile(origin, destiny) {
 			writer.close();
 		} catch { }
 		setTimeout(() => fs.unlink(destiny, (err) => {
-			if (err) { mainPutErrorMsg("Download file remove problem. " + err); }
+			if (err) { mainPutErrorMsg("QinpelDsk download file remove problem. - " + err); }
 		}), 1000);
 	}
 

@@ -1,10 +1,12 @@
 const os = getOs();
 const arch = getArch();
 const execExtension = getExecExtension();
-const rootAddress = "file://" + __dirname;
+const fileAddress = "file:///" + __dirname.toLowerCase().replaceAll("\\", "/");
+const deskAddress = fileAddress + "/desk.html";
+const repoAddress = "http://www.pointel.com.br/qinpel";
 
 module.exports = {
-	os, arch, execExtension, rootAddress
+	os, arch, execExtension, fileAddress, deskAddress, repoAddress
 }
 
 function getOs() {
