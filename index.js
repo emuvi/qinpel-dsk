@@ -17,7 +17,7 @@ const refMainDsk = {
 	load: mainLoad,
 	call: mainCall,
 	loadApp: mainLoadApp,
-	callCmd: mainCallCmd,	
+	callCmd: mainCallCmd,
 	putDebugMsg: mainPutDebugMsg,
 	putLoadMsg: mainPutLoadMsg,
 	putLoadEnd: mainPutLoadEnd,
@@ -115,25 +115,28 @@ function mainCall(script) {
 }
 
 function mainLoadApp(name) {
-	refMainDsk.window.loadURL(refMainDsk.constants.fileAddress
-		+ "/run/apps/" + name + "/index.html");
+	let loadAddress = refMainDsk.constants.fileAddress;
+	if (refMainDsk.constants.serverAddress) {
+		loadAddress = refMainDsk.constants.serverAddress;
+	}
+	loadAddress += "run/apps/" + name + "/index.html";
+	refMainDsk.window.loadURL(loadAddress);
 }
 
-function mainCallCmd(name, arguments) {
+function mainCallCmd(name, withArgs) {
 	return new Promise((resolve, reject) => {
 		let workDir = path.join(__dirname, "run", "cmds", name);
 		let calling = path.join(workDir, name + refMainDsk.constants.execExtension)
-			+ " " + arguments;
-		console.log(`CallCmd ${name} calling: ${calling}`);
-		console.log(`CallCmd ${name} directory: ${workDir}`);
+			+ " " + withArgs;
+		mainPutInfoMsg(`CallCmd ${name} calling: ${calling} with args: ${withArgs}`);
 		exec(calling, {
 			cwd: workDir
 		}, (error, stdout, stderr) => {
 			if (stdout) {
-				console.log(`CallCmd ${name} stdout: ${stdout}`);
+				console.log(`[INFO] CallCmd ${name} stdout: ${stdout}`);
 			}
 			if (stderr) {
-				console.log(`CallCmd ${name} stderr: ${stderr}`);
+				console.log(`[ERROR] CallCmd ${name} stderr: ${stderr}`);
 			}
 			if (error) {
 				reject(error);

@@ -135,6 +135,7 @@ function init(refMainDsk) {
 			refMainDsk.setup.clientHost +
 			(refMainDsk.setup.clientPort ? ":" + refMainDsk.setup.clientPort : "") +
 			(refMainDsk.setup.clientPath ? refMainDsk.setup.clientPath : "/");
+		refMainDsk.constants.serverAddress = mod.address;
 		refMainDsk.putInfoMsg("QinpelSrv address is: " + mod.address);
 		check();
 
