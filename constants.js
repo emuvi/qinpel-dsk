@@ -6,7 +6,7 @@ const deskAddress = fileAddress + "desk.html";
 const repoAddress = "http://www.pointel.com.br/qinpel";
 
 module.exports = {
-	os, arch, execExtension, fileAddress, deskAddress, repoAddress
+	os, arch, execExtension, fileAddress, deskAddress, repoAddress, serverAddress: false
 }
 
 function getOs() {
