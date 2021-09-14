@@ -9,18 +9,17 @@ function init(refMainDsk) {
     initQinpelApp();
 
     function existsInner(mod) {
-        let executable = mod.name + refMainDsk.constants.execExtension;
-        return fs.existsSync("./" + executable);
+        return fs.existsSync(mod.executable);
     }
 
     function downloadInner(mod) {
-        let executable = mod.name + refMainDsk.constants.execExtension;
         let origin = refMainDsk.constants.repoAddress;
         origin += "/cmds/" + refMainDsk.constants.os;
         origin += "/" + refMainDsk.constants.arch;
         origin += "/" + mod.name;
-        origin += "/" + executable;
-        let destiny = executable;
+        origin += "/" + mod.name;
+        origin += refMainDsk.constants.execExtension;
+        let destiny = mod.executable;
         return refMainDsk.utils.downloadFile(origin, destiny);
     }
 
@@ -41,8 +40,10 @@ function init(refMainDsk) {
             neverReady: false,
             errorReady: null,
             name: "qinpel-stp",
+            executable: "",
             call: call,
         };
+        mod.executable = refMainDsk.utils.pathJoin(".", mod.name + refMainDsk.constants.execExtension);
         refMainDsk.mods.qinpelStp = mod;
         refMainDsk.putInfoMsg("QinpelStp starting...");
         refMainDsk.putInfoMsg("QinpelStp checking if exists...");
@@ -67,7 +68,6 @@ function init(refMainDsk) {
         }
 
         function call(withArgs) {
-            const executable = mod.name + refMainDsk.constants.execExtension;
             refMainDsk.putInfoMsg("QinpelStp calling with args: '" + withArgs + "'");
 
             return new Promise((resolve, reject) => {
@@ -94,7 +94,7 @@ function init(refMainDsk) {
 
                 function execute() {
                     refMainDsk.putInfoMsg("QinpelStp executing with args: '" + withArgs + "'");
-                    exec(executable + " " + withArgs, (error, stdout, stderr) => {
+                    exec(mod.executable + " " + withArgs, (error, stdout, stderr) => {
                         if (stdout) {
                             console.log(`QinpelStp stdout: ${stdout}`);
                         }
@@ -118,8 +118,10 @@ function init(refMainDsk) {
             neverReady: false,
             errorReady: null,
             name: "qinpel-srv",
+            executable: "",
             address: "",
         };
+        mod.executable = refMainDsk.utils.pathJoin(".", mod.name + refMainDsk.constants.execExtension);
         refMainDsk.mods.qinpelSrv = mod;
         refMainDsk.putInfoMsg("QinpelSrv starting...");
         refMainDsk.putInfoMsg("QinpelSrv checking address...");
@@ -198,9 +200,8 @@ function init(refMainDsk) {
         }
 
         function call() {
-            const executable = mod.name + refMainDsk.constants.execExtension;
             refMainDsk.putInfoMsg("QinpelSrv calling executable.");
-            exec(executable, (error) => {
+            exec(mod.executable, (error) => {
                 if (error) {
                     refMainDsk.putLoadEndErrorMsg(
                         "QinpelStp problem on running executable. - " + err

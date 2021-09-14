@@ -25,7 +25,7 @@ const refMainDsk = {
     putLoadEndErrorMsg: mainPutLoadEndErrorMsg,
     putInfoMsg: mainPutInfoMsg,
     putErrorMsg: mainPutErrorMsg,
-    utils: { downloadFile },
+    utils: { downloadFile, pathJoin },
     mods: {},
 };
 
@@ -248,4 +248,13 @@ function downloadFile(origin, destiny) {
             remove();
             throw err;
         });
+}
+
+function pathJoin(left, right) {
+    var result = left;
+    if (result) {
+        result += constants.pathSeparator;
+    }
+    result += right;
+    return result;
 }
