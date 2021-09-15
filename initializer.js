@@ -14,7 +14,7 @@ function init(refMainDsk) {
 
     function downloadInner(mod) {
         let origin = refMainDsk.constants.repoAddress;
-        origin += "/cmds/" + refMainDsk.constants.os;
+        origin += "/cmd/" + refMainDsk.constants.os;
         origin += "/" + refMainDsk.constants.arch;
         origin += "/" + mod.name;
         origin += "/" + mod.name;
@@ -227,7 +227,7 @@ function init(refMainDsk) {
         if (!refMainDsk.setup.isLocalHost()) {
             refMainDsk.putInfoMsg("QinpelApp is not expected.");
             mod.isReady = true;
-        } else if (fs.existsSync("run/apps/qinpel-app")) {
+        } else if (fs.existsSync("run/app/qinpel-app")) {
             refMainDsk.putInfoMsg("QinpelApp is ready to go.");
             mod.isReady = true;
         } else {

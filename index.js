@@ -120,14 +120,14 @@ function mainLoadApp(name) {
     if (refMainDsk.constants.serverAddress) {
         loadAddress = refMainDsk.constants.serverAddress;
     }
-    loadAddress += "run/apps/" + name + "/index.html";
+    loadAddress += "run/app/" + name + "/index.html";
     mainPutInfoMsg("QinpelDsk loading app: " + loadAddress);
     refMainDsk.window.loadURL(loadAddress);
 }
 
 function mainCallCmd(name, withArgs) {
     return new Promise((resolve, reject) => {
-        let workDir = path.join(__dirname, "run", "cmds", name);
+        let workDir = path.join(__dirname, "run", "cmd", name);
         let calling =
             path.join(workDir, name + refMainDsk.constants.execExtension) + " " + withArgs;
         mainPutInfoMsg(`CallCmd ${name} calling: ${calling} with args: ${withArgs}`);
