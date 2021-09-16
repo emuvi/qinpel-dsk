@@ -1,0 +1,14 @@
+[
+    {
+        "name": "everton",
+        "pass": "test",
+        "master": false,
+        "access": []
+    },
+    {
+        "name": "anderson",
+        "pass": "test",
+        "master": false,
+        "access": [{"APP": {"name" : "admister"}}]
+    }
+]
