@@ -60,7 +60,7 @@ async function windowCreate() {
     const window = new BrowserWindow(options);
     refMainDsk.window = window;
     window.removeMenu();
-    window.loadURL(refMainDsk.constants.deskAddress);
+    window.loadURL(refMainDsk.constants.deskAddress, {"extraHeaders" : "pragma: no-cache\n"});
     window.once("ready-to-show", window.show);
     window.on("close", () => {
         storage.set("QinpelDskMainWindowBounds", window.getBounds());
@@ -120,7 +120,7 @@ function mainStart() {
 }
 
 function mainLoad(address) {
-    refMainDsk.window.loadURL(address);
+    refMainDsk.window.loadURL(address, {"extraHeaders" : "pragma: no-cache\n"});
 }
 
 function mainCall(script) {
@@ -134,7 +134,7 @@ function mainLoadApp(name) {
     }
     loadAddress += "run/app/" + name + "/index.html";
     mainPutInfoMsg("QinpelDsk loading app: " + loadAddress);
-    refMainDsk.window.loadURL(loadAddress);
+    refMainDsk.window.loadURL(loadAddress, {"extraHeaders" : "pragma: no-cache\n"});
 }
 
 function mainCallCmd(name, withArgs) {

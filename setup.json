@@ -1,5 +1,5 @@
 {
-    "clientHost": "localhost",
+    "clientHost": "external.test.com",
     "clientPort": 5490,
     "clientPath": "/",
     "serverHost": "0.0.0.0",
