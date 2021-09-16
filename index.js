@@ -1,4 +1,5 @@
-const { app, BrowserWindow } = require("electron");
+const console = require("console");
+const { app, BrowserWindow, ipcMain } = require("electron");
 const ElectronStore = require("electron-store");
 const storage = new ElectronStore();
 
@@ -30,6 +31,7 @@ const refMainDsk = {
 };
 
 app.commandLine.appendSwitch("disable-http-cache");
+app.console = new console.Console(process.stdout, process.stderr);
 
 app.whenReady().then(() => {
     windowCreate();
@@ -39,10 +41,20 @@ app.on("window-all-closed", function () {
     if (process.platform !== "darwin") app.quit();
 });
 
-function windowCreate() {
+ipcMain.on("logOnMain", (_, message) => {
+    console.log("[VIEW] : " + message);
+});
+
+async function windowCreate() {
     const options = {
-        icon: __dirname + "/favicon.ico",
         show: false,
+        icon: __dirname + "/favicon.ico",
+        webPreferences: {
+            nodeIntegration: false,
+            contextIsolation: true,
+            enableRemoteModule: false,
+            preload: path.join(__dirname, "preload.js")
+        }
     };
     Object.assign(options, storage.get("QinpelDskMainWindowBounds"));
     const window = new BrowserWindow(options);
