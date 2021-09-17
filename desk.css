@@ -6,6 +6,9 @@
 
 body {
   background-image: url('./desk-back.png');
+  background-color: #fffefa;
+  font-family: Arial, Helvetica, Tahoma, Geneva, Verdana, sans-serif;
+  color: #270036;
 }
 
 #QinpelDeskBody {
@@ -18,7 +21,7 @@ body {
 
 #QinpelDeskMain {
   flex: 1;
-  border: 2px solid black;
+  border: 2px solid #270036;
   border-radius: 4px;
   max-width: 600px;
   background-color: white;
@@ -27,7 +30,7 @@ body {
 
 #QinpelDeskHead {
   padding: 6px;
-  background-color: #2e0036;
+  background-color: #360045;
   color: white;
   display: flex;
   align-items: center;
