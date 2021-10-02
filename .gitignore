@@ -4,4 +4,6 @@
 /run
 qinpel-stp*
 qinpel-srv*
+bases.json
+users.json
 *.log
