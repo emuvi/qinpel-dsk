@@ -45,6 +45,14 @@ ipcMain.on("logOnMain", (_, message) => {
     console.log("[VIEW] : " + message);
 });
 
+ipcMain.on("toggleDevTools", () => {
+    if (refMainDsk.window.webContents.isDevToolsOpened()) {
+        refMainDsk.window.webContents.closeDevTools();
+    } else {
+        refMainDsk.window.webContents.openDevTools();
+    }
+});
+
 async function windowCreate() {
     const options = {
         show: false,

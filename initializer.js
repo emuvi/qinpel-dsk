@@ -246,4 +246,6 @@ function init(refMainDsk) {
     }
 }
 
-module.exports = { init };
+const initializer = { init };
+
+module.exports = initializer;

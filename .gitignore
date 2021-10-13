@@ -1,7 +1,7 @@
-/build
-/node_modules
-/programs
-/run
+build/
+node_modules/
+programs/
+run/
 qinpel-stp*
 qinpel-srv*
 bases.json
