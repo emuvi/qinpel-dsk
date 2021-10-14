@@ -1,7 +1,7 @@
 {
 	"name": "qinpel-dsk",
 	"version": "0.1.0",
-	"description": "QinpelDsk - Desktop Manager for Qinpel",
+	"description": "QinpelDsk - Desktop Platform for Qinpel",
 	"repository": "https://github.com/emuvi/qinpel-dsk",
 	"main": "index.js",
 	"scripts": {
