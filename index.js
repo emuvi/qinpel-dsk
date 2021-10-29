@@ -80,6 +80,7 @@ async function windowCreate() {
             refMainDsk.call("putInfoMsg('QinpelDsk starting...')");
             initializer.init(refMainDsk);
             mainStart();
+            // window.webContents.openDevTools();
         }
     });
 }
