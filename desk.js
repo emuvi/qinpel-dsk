@@ -4,6 +4,7 @@ const imgFootLoad = document.getElementById("QinpelDeskFootImgLoad");
 const imgFootInfo = document.getElementById("QinpelDeskFootImgInfo");
 const imgFootError = document.getElementById("QinpelDeskFootImgError");
 var countImgFootLoad = 0;
+
 addMsg("QinpelDsk Logger");
 hideFoot();
 

@@ -30,7 +30,9 @@ const refMainDsk = {
     mods: {},
 };
 
-app.commandLine.appendSwitch("disable-http-cache");
+if (constants.debug) {
+    app.commandLine.appendSwitch("disable-http-cache");
+}
 app.console = new console.Console(process.stdout, process.stderr);
 
 app.whenReady().then(() => {
@@ -68,7 +70,7 @@ async function windowCreate() {
     const window = new BrowserWindow(options);
     refMainDsk.window = window;
     window.removeMenu();
-    window.loadURL(refMainDsk.constants.deskAddress, {"extraHeaders" : "pragma: no-cache\n"});
+    window.loadURL(refMainDsk.constants.deskAddress, { "extraHeaders": "pragma: no-cache\n" });
     window.once("ready-to-show", window.show);
     window.on("close", () => {
         storage.set("QinpelDskMainWindowBounds", window.getBounds());
@@ -77,10 +79,12 @@ async function windowCreate() {
     window.webContents.on("did-finish-load", () => {
         if (firstLoad) {
             firstLoad = false;
-            refMainDsk.call("putInfoMsg('QinpelDsk starting...')");
+            mainPutInfoMsg("QinpelDsk starting...");
             initializer.init(refMainDsk);
+            if (constants.debug) {
+                window.webContents.openDevTools();
+            }
             mainStart();
-            // window.webContents.openDevTools();
         }
     });
 }
@@ -89,19 +93,16 @@ function mainStart() {
     tryStart();
 
     function tryStart() {
-        if (allReady()) {
+        if (isAllReady()) {
             start();
+        } else if (isSomeNeverReady()) {
+            abort();
         } else {
-            let error = getErrorNever();
-            if (error) {
-                abort(error);
-            } else {
-                setTimeout(tryStart, 1000);
-            }
+            setTimeout(tryStart, 1000);
         }
     }
 
-    function allReady() {
+    function isAllReady() {
         for (const mod in refMainDsk.mods) {
             if (!refMainDsk.mods[mod].isReady) {
                 return false;
@@ -110,10 +111,10 @@ function mainStart() {
         return true;
     }
 
-    function getErrorNever() {
+    function isSomeNeverReady() {
         for (const mod in refMainDsk.mods) {
             if (refMainDsk.mods[mod].neverReady) {
-                return mod.errorReady;
+                return true;
             }
         }
         return false;
@@ -123,13 +124,13 @@ function mainStart() {
         mainLoadApp("qinpel-app");
     }
 
-    function abort(error) {
-        mainPutErrorMsg("QinpelDsk had problems to be started. - " + error);
+    function abort() {
+        mainPutErrorMsg("QinpelDsk had problems and could not be started.");
     }
 }
 
 function mainLoad(address) {
-    refMainDsk.window.loadURL(address, {"extraHeaders" : "pragma: no-cache\n"});
+    refMainDsk.window.loadURL(address, { "extraHeaders": "pragma: no-cache\n" });
 }
 
 function mainCall(script) {
@@ -143,7 +144,7 @@ function mainLoadApp(name) {
     }
     loadAddress += "run/app/" + name + "/index.html";
     mainPutInfoMsg("QinpelDsk loading app: " + loadAddress);
-    refMainDsk.window.loadURL(loadAddress, {"extraHeaders" : "pragma: no-cache\n"});
+    refMainDsk.window.loadURL(loadAddress, { "extraHeaders": "pragma: no-cache\n" });
 }
 
 function mainCallCmd(name, withArgs) {
@@ -153,10 +154,7 @@ function mainCallCmd(name, withArgs) {
             path.join(workDir, name + refMainDsk.constants.execExtension) + " " + withArgs;
         mainPutInfoMsg(`CallCmd ${name} calling: ${calling} with args: ${withArgs}`);
         exec(
-            calling,
-            {
-                cwd: workDir,
-            },
+            calling, { cwd: workDir },
             (error, stdout, stderr) => {
                 if (stdout) {
                     console.log(`[INFO] CallCmd ${name} stdout: ${stdout}`);
@@ -179,6 +177,8 @@ function mainPutDebugMsg(message) {
 }
 
 function mainPutLoadMsg(message) {
+    message = message ? message.toString() : "";
+    message = message.replaceAll("`", "'");
     console.log("[LOAD] : " + message);
     if (isDeskLoaded()) {
         refMainDsk.call("putLoadMsg(`" + message + "`)");
@@ -202,6 +202,8 @@ function mainPutLoadEndErrorMsg(message) {
 }
 
 function mainPutInfoMsg(message) {
+    message = message ? message.toString() : "";
+    message = message.replaceAll("`", "'");
     console.log("[INFO] : " + message);
     if (isDeskLoaded()) {
         refMainDsk.call("putInfoMsg(`" + message + "`)");
@@ -209,6 +211,8 @@ function mainPutInfoMsg(message) {
 }
 
 function mainPutErrorMsg(message) {
+    message = message ? message.toString() : "";
+    message = message.replaceAll("`", "'");
     console.log("[ERROR] : " + message);
     if (isDeskLoaded()) {
         refMainDsk.call("putErrorMsg(`" + message + "`)");
@@ -227,32 +231,22 @@ function downloadFile(origin, destiny) {
     const writer = fs.createWriteStream(destiny);
 
     function remove() {
-        try {
-            writer.close();
-        } catch { }
-        setTimeout(
-            () =>
-                fs.unlink(destiny, (err) => {
-                    if (err) {
-                        mainPutErrorMsg("QinpelDsk download file remove problem. - " + err);
-                    }
-                }),
-            1000
-        );
+        try { writer.close(); } catch { }
+        setTimeout(() => fs.unlink(destiny), 1000);
     }
 
-    return axios({
-        method: "get",
-        url: origin,
-        responseType: "stream",
-    })
-        .then((response) => {
-            return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
+        const config = {
+            url: origin,
+            method: "get",
+            responseType: "stream",
+        };
+        axios(config)
+            .then((response) => {
                 response.data.pipe(writer);
-                let error = null;
+                var error = null;
                 writer.on("error", (err) => {
                     error = err;
-                    writer.close();
                     remove();
                     reject(err);
                 });
@@ -263,19 +257,19 @@ function downloadFile(origin, destiny) {
                         remove();
                     }
                 });
+            })
+            .catch((err) => {
+                remove();
+                reject(err);
             });
-        })
-        .catch((err) => {
-            remove();
-            throw err;
-        });
+    });
 }
 
 function pathJoin(left, right) {
-    var result = left;
+    var result = left ? left.toString() : "";
     if (result) {
         result += constants.pathSeparator;
     }
-    result += right;
+    result += right ? right.toString() : "";
     return result;
 }

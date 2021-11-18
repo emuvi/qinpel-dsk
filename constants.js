@@ -1,3 +1,4 @@
+const debug = !!process.argv.find(el => el == "-d" || el == "--debug");
 const os = getOs();
 const arch = getArch();
 const pathSeparator = os == "win" ? "\\" : "/";
@@ -7,7 +8,7 @@ const deskAddress = fileAddress + "desk.html";
 const repoAddress = "http://www.pointel.com.br/qinpel";
 
 module.exports = {
-	os, arch, pathSeparator, execExtension, fileAddress, deskAddress, repoAddress, serverAddress: false
+	debug, os, arch, pathSeparator, execExtension, fileAddress, deskAddress, repoAddress, serverAddress: false
 }
 
 function getOs() {
