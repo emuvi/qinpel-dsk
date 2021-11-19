@@ -7,3 +7,4 @@ qinpel-srv*
 bases.json
 users.json
 *.log
+package-lock.json
