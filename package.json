@@ -1,16 +1,15 @@
 {
 	"name": "qinpel-dsk",
 	"version": "0.1.0",
-	"description": "QinpelDsk - Desktop Platform for Qinpel",
+	"description": "Qinpel Desk - Desktop bundle for the Qinpel (Quick Interface for Pointel) Platform.",
 	"repository": "https://github.com/emuvi/qinpel-dsk",
+	"author": "Éverton M. Vieira",
+	"license": "LGPL-3.0-only",
 	"main": "index.js",
 	"scripts": {
 		"start": "electron . --debug",
 		"build": "electron-packager . --all --overwrite --icon=favicon.ico --out=build Qinpel"
 	},
-	"keywords": [],
-	"author": "Éverton M. Vieira",
-	"license": "LGPL-3.0-only",
 	"dependencies": {
 		"axios": "^0.24",
 		"electron-store": "^8"
