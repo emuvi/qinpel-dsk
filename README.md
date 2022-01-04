@@ -1,4 +1,3 @@
-QinpelDsk
-=========
+# QinpelDsk
 
-Qinpel Desk - Desktop bundle for the Qinpel (Quick Interface for Pointel) Platform.
+QinpelDsk ( Qinpel Desk ) is an application that bundles the Quick Interface for Pointel platform in an Electron app.
