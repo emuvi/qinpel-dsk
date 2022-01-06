@@ -1,7 +1,7 @@
 {
 	"name": "qinpel-dsk",
 	"version": "0.1.0",
-	"description": "Qinpel Desk - Desktop bundle for the Qinpel (Quick Interface for Pointel) Platform.",
+	"description": "QinpelDsk ( Qinpel Desk ) is an application that bundles the Quick Interface for Pointel platform in an Electron app.",
 	"repository": "https://github.com/emuvi/qinpel-dsk",
 	"author": "Éverton M. Vieira",
 	"license": "LGPL-3.0-only",
