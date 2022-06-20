@@ -13,7 +13,7 @@
     "watch": "tsc -w",
     "lint": "eslint -c .eslintrc --ext .ts ./src",
     "start": "npm run build && electron ./public/main.js",
-    "dist": "electron-packager . --all --overwrite --icon=public/favicon.ico --out=dist Qinpel"
+    "dist": "electron-packager . --overwrite --icon=public/favicon.ico --out=dist Qinpel"
   },
   "dependencies": {
     "axios": "^0.24",
