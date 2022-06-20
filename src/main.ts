@@ -4,7 +4,6 @@ import constants from "./constants";
 import ElectronStore = require("electron-store");
 const storage = new ElectronStore();
 const fs = require("fs");
-const path = require("path");
 const axios = require("axios");
 const setup = require("./setup.json");
 
@@ -31,12 +30,12 @@ if (constants.debug) {
 function createWindow() {
   const options = {
     show: false,
-    icon: path.join(__dirname, "/favicon.ico"),
+    icon: pathJoin(__dirname, "/favicon.ico"),
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
       enableRemoteModule: false,
-      preload: path.join(__dirname, "/preload.js"),
+      preload: pathJoin(__dirname, "/preload.js"),
     },
   };
   Object.assign(options, storage.get("QinpelDskMainWindowBounds"));
