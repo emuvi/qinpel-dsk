@@ -1,23 +1,30 @@
 {
-	"name": "qinpel-dsk",
-	"displayName": "QinpelDsk",
-	"description": "QinpelDsk ( Qinpel Desk ) is the desktop application that bundles the Quick Interface for Pointel platform in an Electron app.",
-	"keywords": [], 
-	"repository": "https://github.com/emuvi/qinpel-dsk",
-	"author": "Éverton M. Vieira",
-	"license": "LGPL-3.0-only",
-	"version": "0.1.1",
-	"main": "index.js",
-	"dependencies": {
-		"axios": "^0.24",
-		"electron-store": "^8"
-	},
-	"devDependencies": {
-		"electron": "^13",
-		"electron-packager": "^15"
-	},
-	"scripts": {
-		"start": "electron . --debug",
-		"build": "electron-packager . --all --overwrite --icon=favicon.ico --out=build Qinpel"
-	}
+  "name": "qinpel-dsk",
+  "displayName": "QinpelDsk",
+  "description": "QinpelDsk ( Qinpel Desk ) is the desktop application that bundles the Quick Interface for Pointel platform in an Electron app.",
+  "keywords": [],
+  "repository": "https://github.com/emuvi/qinpel-dsk",
+  "author": "Éverton M. Vieira",
+  "license": "LGPL-3.0-only",
+  "version": "0.1.1",
+  "main": "public/main.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "lint": "eslint -c .eslintrc --ext .ts ./src",
+    "start": "npm run build && electron ./public/main.js",
+    "dist": "electron-packager . --all --overwrite --icon=public/favicon.ico --out=dist Qinpel"
+  },
+  "dependencies": {
+    "axios": "^0.24",
+    "electron-store": "^8"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^4",
+    "@typescript-eslint/parser": "^4",
+    "electron": "^18",
+    "eslint": "^7",
+    "typescript": "^4",
+    "electron-packager": "^15"
+  }
 }

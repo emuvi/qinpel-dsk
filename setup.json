@@ -1,7 +1,0 @@
-{
-    "serverHost": "localhost",
-    "serverPort": 5490,
-    "clientHost": "localhost",
-    "clientPort": 5490,
-    "clientPath": "/"
-}

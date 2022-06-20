@@ -5,7 +5,7 @@
 }
 
 body {
-  background-image: url('./desk-back.png');
+  background-image: url("./desk-back.png");
   background-color: #fffefa;
   font-family: Arial, Helvetica, Tahoma, Geneva, Verdana, sans-serif;
   color: #270036;
@@ -36,11 +36,11 @@ body {
   align-items: center;
   justify-content: center;
   font-size: 36px;
-  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
   font-weight: bold;
 }
 
-#QinpelDeskHead > img {
+#QinpelDeskHead img {
   margin-right: 12px;
 }
 

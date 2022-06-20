@@ -1,0 +1,8 @@
+{
+  "serverHost": "localhost",
+  "serverPort": 5490,
+  "serverPath": "/app/qinpel-app/index.html",
+  "callIfFail": "start cmd /c \"cd C:\\Devs\\Test && start.bat\"",
+  "retryDelay": 1000,
+  "retryTimes": 3
+}

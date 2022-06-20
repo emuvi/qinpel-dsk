@@ -1,8 +1,2 @@
-node_modules/
-build/
-run/
-qinpel-stp*
-qinpel-srv*
-bases.json
-users.json
-*.log
+node_modules
+dist
